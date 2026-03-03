@@ -373,6 +373,104 @@
             line-height: 1.5;
         }
 
+        /* Lock screen */
+        .lock-screen {
+            position: fixed;
+            inset: 0;
+            background: #f0f2f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .lock-screen.hidden {
+            display: none;
+        }
+
+        .lock-box {
+            background: #fff;
+            border-radius: 20px;
+            padding: 2.5rem 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            max-width: 360px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .lock-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .lock-box h2 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 0.35rem;
+        }
+
+        .lock-box p {
+            color: #6b7280;
+            font-size: 0.85rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .lock-box input[type="password"] {
+            width: 100%;
+            padding: 0.7rem 1rem;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-family: inherit;
+            text-align: center;
+            letter-spacing: 0.15em;
+            transition: border-color 0.15s;
+        }
+
+        .lock-box input[type="password"]:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99,102,241,0.1);
+        }
+
+        .lock-box input[type="password"].shake {
+            animation: shake 0.4s ease;
+            border-color: #ef4444;
+        }
+
+        .lock-box button {
+            margin-top: 1rem;
+            width: 100%;
+            padding: 0.7rem;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: opacity 0.15s;
+        }
+
+        .lock-box button:hover {
+            opacity: 0.9;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-8px); }
+            40% { transform: translateX(8px); }
+            60% { transform: translateX(-6px); }
+            80% { transform: translateX(6px); }
+        }
+
+        .app-content.locked {
+            filter: blur(8px);
+            pointer-events: none;
+            user-select: none;
+        }
+
         @media (max-width: 400px) {
             body { padding: 1rem 0.75rem; }
             .result-main { font-size: 2rem; }
@@ -381,7 +479,19 @@
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="lock-screen" id="lock-screen">
+        <div class="lock-box">
+            <div class="lock-icon">&#128274;</div>
+            <h2>Calculateur Nounou</h2>
+            <p>Entrez le mot de passe pour acc&eacute;der</p>
+            <form onsubmit="return checkPassword(event)">
+                <input type="password" id="password-input" placeholder="Mot de passe" autocomplete="off" autofocus>
+                <button type="submit">D&eacute;verrouiller</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="container app-content locked" id="app-content">
         <h1>Calculateur Nounou</h1>
         <p class="subtitle">Eve MARTINS &mdash; Camille LABLANCHE</p>
 
@@ -497,6 +607,20 @@
     </div>
 
     <script>
+        function checkPassword(e) {
+            e.preventDefault();
+            const input = document.getElementById('password-input');
+            if (input.value === 'eve') {
+                document.getElementById('lock-screen').classList.add('hidden');
+                document.getElementById('app-content').classList.remove('locked');
+            } else {
+                input.classList.add('shake');
+                input.value = '';
+                setTimeout(() => input.classList.remove('shake'), 400);
+            }
+            return false;
+        }
+
         const WORK_DAYS = [1, 2, 4, 5]; // lundi, mardi, jeudi, vendredi
 
         const HOLIDAYS = {
