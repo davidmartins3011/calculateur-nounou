@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculateur Nounou</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background: #f0f2f5;
+            color: #1a1a2e;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 480px;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .subtitle {
+            color: #6b7280;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        }
+
+        .card-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #6b7280;
+            margin-bottom: 1rem;
+        }
+
+        .field {
+            margin-bottom: 1rem;
+        }
+
+        .field:last-child {
+            margin-bottom: 0;
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 0.35rem;
+        }
+
+        label .unit {
+            font-weight: 400;
+            color: #9ca3af;
+        }
+
+        input[type="number"], select {
+            width: 100%;
+            padding: 0.6rem 0.75rem;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: inherit;
+            color: #1a1a2e;
+            background: #fff;
+            transition: border-color 0.15s;
+            -moz-appearance: textfield;
+        }
+
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            opacity: 1;
+        }
+
+        input[type="number"]:focus, select:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99,102,241,0.1);
+        }
+
+        .row {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .row .field {
+            flex: 1;
+        }
+
+        /* Calendar */
+        .month-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+
+        .month-nav button {
+            background: #f3f4f6;
+            border: none;
+            border-radius: 8px;
+            width: 36px;
+            height: 36px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            color: #374151;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.15s;
+        }
+
+        .month-nav button:hover {
+            background: #e5e7eb;
+        }
+
+        .month-nav .month-label {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .cal-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+        }
+
+        .cal-header {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #9ca3af;
+            text-align: center;
+            padding: 0.25rem 0;
+            text-transform: uppercase;
+        }
+
+        .cal-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            cursor: default;
+            color: #d1d5db;
+            font-weight: 500;
+            position: relative;
+        }
+
+        .cal-day.workday {
+            color: #374151;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .cal-day.workday:hover {
+            background: #f3f4f6;
+        }
+
+        .cal-day.active {
+            background: #6366f1;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .cal-day.active:hover {
+            background: #4f46e5;
+        }
+
+        .cal-day.holiday {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .cal-day.holiday.active {
+            background: #f59e0b;
+            color: #fff;
+        }
+
+        .cal-day.today {
+            box-shadow: inset 0 0 0 2px #6366f1;
+        }
+
+        .cal-summary {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid #f3f4f6;
+        }
+
+        .cal-count {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #6366f1;
+        }
+
+        .cal-count-label {
+            font-size: 0.8rem;
+            color: #6b7280;
+        }
+
+        .cal-legend {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.72rem;
+            color: #9ca3af;
+        }
+
+        .cal-legend span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .cal-legend .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 4px;
+        }
+
+        .cal-legend .dot.active { background: #6366f1; }
+        .cal-legend .dot.off { background: #e5e7eb; }
+        .cal-legend .dot.holiday { background: #fef3c7; border: 1px solid #fde68a; }
+
+        /* Acompte field */
+        .acompte-field {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #f3f4f6;
+        }
+
+        /* Contract summary */
+        .contract-summary {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+        }
+
+        .contract-item {
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 0.6rem 0.75rem;
+        }
+
+        .contract-item .val {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: #1a1a2e;
+        }
+
+        .contract-item .lbl {
+            font-size: 0.72rem;
+            color: #9ca3af;
+            margin-top: 0.1rem;
+        }
+
+        .toggle-btn {
+            background: none;
+            border: none;
+            color: #6366f1;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            padding: 0.25rem 0;
+            margin-top: 0.75rem;
+            font-family: inherit;
+        }
+
+        .toggle-btn:hover {
+            text-decoration: underline;
+        }
+
+        .contract-edit {
+            display: none;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #f3f4f6;
+        }
+
+        .contract-edit.open {
+            display: block;
+        }
+
+        /* Result */
+        .result-card {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: #fff;
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 15px rgba(99,102,241,0.3);
+        }
+
+        .result-card .card-title {
+            color: rgba(255,255,255,0.7);
+        }
+
+        .result-main {
+            font-size: 2.4rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .result-label {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .result-refund {
+            display: none;
+            margin-top: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            background: rgba(255,255,255,0.15);
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+
+        .breakdown {
+            margin-top: 1.25rem;
+            padding-top: 1.25rem;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .breakdown-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.3rem 0;
+            font-size: 0.9rem;
+        }
+
+        .breakdown-row .label {
+            color: rgba(255,255,255,0.8);
+        }
+
+        .breakdown-row .value {
+            font-weight: 600;
+        }
+
+        .breakdown-row.highlight {
+            font-size: 1rem;
+            padding-top: 0.75rem;
+            margin-top: 0.5rem;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .info {
+            background: #eff6ff;
+            border-radius: 10px;
+            padding: 0.85rem 1rem;
+            font-size: 0.8rem;
+            color: #3b82f6;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 400px) {
+            body { padding: 1rem 0.75rem; }
+            .result-main { font-size: 2rem; }
+            .row { flex-direction: column; gap: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Calculateur Nounou</h1>
+        <p class="subtitle">Eve MARTINS &mdash; Camille LABLANCHE</p>
+
+        <div class="card">
+            <div class="card-title">Contrat</div>
+            <div class="contract-summary">
+                <div class="contract-item">
+                    <div class="val" id="display-salary">571,90 &euro;</div>
+                    <div class="lbl">Salaire net mensualis&eacute;</div>
+                </div>
+                <div class="contract-item">
+                    <div class="val" id="display-entretien">3,80 &euro;</div>
+                    <div class="lbl">Entretien / jour</div>
+                </div>
+                <div class="contract-item">
+                    <div class="val">Lu Ma Je Ve</div>
+                    <div class="lbl">Jours de garde</div>
+                </div>
+                <div class="contract-item">
+                    <div class="val" id="display-cmg">36,58 %</div>
+                    <div class="lbl">Taux CMG (janv. 2026)</div>
+                </div>
+            </div>
+            <button class="toggle-btn" id="toggle-edit" onclick="toggleEdit()">Modifier les param&egrave;tres</button>
+            <div class="contract-edit" id="contract-edit">
+                <div class="field">
+                    <label>Salaire net mensualis&eacute; <span class="unit">(&euro;/mois)</span></label>
+                    <input type="number" id="salaire-mensuel" value="571.90" step="0.01" oninput="calculate()">
+                </div>
+                <div class="row">
+                    <div class="field">
+                        <label>Entretien <span class="unit">(&euro;/jour)</span></label>
+                        <input type="number" id="entretien" value="3.80" step="0.01" oninput="calculate()">
+                    </div>
+                    <div class="field">
+                        <label>Repas <span class="unit">(&euro;/jour)</span></label>
+                        <input type="number" id="repas" value="0" step="0.01" oninput="calculate()">
+                    </div>
+                </div>
+                <div class="field">
+                    <label>Taux CMG <span class="unit">(%)</span></label>
+                    <input type="number" id="cmg-rate" value="36.58" step="0.01" oninput="calculate()">
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Jours de garde du mois</div>
+            <div class="month-nav">
+                <button onclick="changeMonth(-1)">&larr;</button>
+                <span class="month-label" id="month-label"></span>
+                <button onclick="changeMonth(1)">&rarr;</button>
+            </div>
+            <div class="cal-grid" id="cal-grid"></div>
+            <div class="cal-summary">
+                <div>
+                    <div class="cal-count" id="day-count">0</div>
+                    <div class="cal-count-label">jours de garde</div>
+                </div>
+                <div class="cal-legend">
+                    <span><span class="dot active"></span> Garde</span>
+                    <span><span class="dot off"></span> Retir&eacute;</span>
+                    <span><span class="dot holiday"></span> F&eacute;ri&eacute;</span>
+                </div>
+            </div>
+            <div class="acompte-field">
+                <label>Acompte d&eacute;j&agrave; vers&eacute; <span class="unit">(&euro;)</span></label>
+                <input type="number" id="acompte" value="0" min="0" step="0.01" oninput="calculate()">
+            </div>
+        </div>
+
+        <div class="result-card">
+            <div class="card-title">R&eacute;sultat</div>
+            <div class="result-main" id="result-total">0,00 &euro;</div>
+            <div class="result-label" id="result-label">&agrave; payer ce mois (apr&egrave;s CMG)</div>
+            <div class="result-refund" id="result-refund"></div>
+
+            <div class="breakdown">
+                <div class="breakdown-row">
+                    <span class="label">Salaire mensualis&eacute;</span>
+                    <span class="value" id="r-salaire">0 &euro;</span>
+                </div>
+                <div class="breakdown-row">
+                    <span class="label">Indemnit&eacute;s entretien</span>
+                    <span class="value" id="r-entretien">0 &euro;</span>
+                </div>
+                <div class="breakdown-row">
+                    <span class="label">Indemnit&eacute;s repas</span>
+                    <span class="value" id="r-repas">0 &euro;</span>
+                </div>
+                <div class="breakdown-row highlight">
+                    <span class="label">Salaire total d&eacute;clar&eacute;</span>
+                    <span class="value" id="r-total-salaire">0 &euro;</span>
+                </div>
+                <div class="breakdown-row" style="margin-top: 0.75rem;">
+                    <span class="label">CMG R&eacute;mun&eacute;ration</span>
+                    <span class="value" id="r-cmg">- 0 &euro;</span>
+                </div>
+                <div class="breakdown-row">
+                    <span class="label">Acompte vers&eacute;</span>
+                    <span class="value" id="r-acompte">- 0 &euro;</span>
+                </div>
+                <div class="breakdown-row">
+                    <span class="label">Cotisations</span>
+                    <span class="value">0 &euro; (CAF)</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="info">
+            Cotisations 100% CAF. Taux CMG de 36,58% bas&eacute; sur le relev&eacute; de janvier 2026. Contrat : 37h/sem sur 43 semaines, 4,30&euro; net/h. Cliquez sur un jour du calendrier pour l'ajouter ou le retirer.
+        </div>
+    </div>
+
+    <script>
+        const WORK_DAYS = [1, 2, 4, 5]; // lundi, mardi, jeudi, vendredi
+
+        const HOLIDAYS = {
+            '2025-01-01': "Jour de l'an",
+            '2025-04-21': 'Lundi de Pâques',
+            '2025-05-01': 'Fête du Travail',
+            '2025-05-08': 'Victoire 1945',
+            '2025-05-29': 'Ascension',
+            '2025-06-09': 'Lundi de Pentecôte',
+            '2025-07-14': 'Fête nationale',
+            '2025-08-15': 'Assomption',
+            '2025-11-01': 'Toussaint',
+            '2025-11-11': 'Armistice',
+            '2025-12-25': 'Noël',
+            '2026-01-01': "Jour de l'an",
+            '2026-04-06': 'Lundi de Pâques',
+            '2026-05-01': 'Fête du Travail',
+            '2026-05-08': 'Victoire 1945',
+            '2026-05-14': 'Ascension',
+            '2026-05-25': 'Lundi de Pentecôte',
+            '2026-07-14': 'Fête nationale',
+            '2026-08-15': 'Assomption',
+            '2026-11-01': 'Toussaint',
+            '2026-11-11': 'Armistice',
+            '2026-12-25': 'Noël',
+            '2027-01-01': "Jour de l'an",
+            '2027-03-29': 'Lundi de Pâques',
+            '2027-05-01': 'Fête du Travail',
+            '2027-05-06': 'Ascension',
+            '2027-05-08': 'Victoire 1945',
+            '2027-05-17': 'Lundi de Pentecôte',
+            '2027-07-14': 'Fête nationale',
+            '2027-08-15': 'Assomption',
+            '2027-11-01': 'Toussaint',
+            '2027-11-11': 'Armistice',
+            '2027-12-25': 'Noël',
+        };
+
+        const MONTHS_FR = [
+            'Janvier','Février','Mars','Avril','Mai','Juin',
+            'Juillet','Août','Septembre','Octobre','Novembre','Décembre'
+        ];
+
+        let currentYear = 2026;
+        let currentMonth = 2; // mars (0-indexed)
+        let activeDays = new Set();
+
+        function dateKey(y, m, d) {
+            return `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+        }
+
+        function isHoliday(y, m, d) {
+            return HOLIDAYS[dateKey(y, m, d)] || null;
+        }
+
+        function isToday(y, m, d) {
+            const t = new Date();
+            return t.getFullYear() === y && t.getMonth() === m && t.getDate() === d;
+        }
+
+        function buildCalendar() {
+            const grid = document.getElementById('cal-grid');
+            grid.innerHTML = '';
+
+            document.getElementById('month-label').textContent =
+                `${MONTHS_FR[currentMonth]} ${currentYear}`;
+
+            const headers = ['Lu','Ma','Me','Je','Ve','Sa','Di'];
+            headers.forEach(h => {
+                const el = document.createElement('div');
+                el.className = 'cal-header';
+                el.textContent = h;
+                grid.appendChild(el);
+            });
+
+            const firstDay = new Date(currentYear, currentMonth, 1);
+            let startDow = firstDay.getDay();
+            startDow = startDow === 0 ? 6 : startDow - 1; // convert to Mon=0
+
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+            for (let i = 0; i < startDow; i++) {
+                const el = document.createElement('div');
+                el.className = 'cal-day';
+                grid.appendChild(el);
+            }
+
+            activeDays.clear();
+
+            for (let d = 1; d <= daysInMonth; d++) {
+                const date = new Date(currentYear, currentMonth, d);
+                const dow = date.getDay();
+                const el = document.createElement('div');
+                el.className = 'cal-day';
+                el.textContent = d;
+                el.dataset.day = d;
+
+                const holiday = isHoliday(currentYear, currentMonth, d);
+
+                if (WORK_DAYS.includes(dow)) {
+                    el.classList.add('workday');
+                    if (holiday) {
+                        el.classList.add('holiday');
+                        el.title = holiday + ' (férié)';
+                    } else {
+                        el.classList.add('active');
+                        activeDays.add(d);
+                    }
+
+                    el.addEventListener('click', () => toggleDay(d, el));
+                }
+
+                if (isToday(currentYear, currentMonth, d)) {
+                    el.classList.add('today');
+                }
+
+                grid.appendChild(el);
+            }
+
+            calculate();
+        }
+
+        function toggleDay(d, el) {
+            if (activeDays.has(d)) {
+                activeDays.delete(d);
+                el.classList.remove('active');
+            } else {
+                activeDays.add(d);
+                el.classList.add('active');
+            }
+            calculate();
+        }
+
+        function changeMonth(delta) {
+            currentMonth += delta;
+            if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+            if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+            buildCalendar();
+        }
+
+        function fmt(n) {
+            return n.toLocaleString('fr-FR', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }) + ' \u20AC';
+        }
+
+        function val(id) {
+            return parseFloat(document.getElementById(id).value) || 0;
+        }
+
+        function calculate() {
+            const salaireMensuel = val('salaire-mensuel');
+            const entretienJour = val('entretien');
+            const repasJour = val('repas');
+            const cmgRate = val('cmg-rate') / 100;
+            const joursGarde = activeDays.size;
+            const acompte = val('acompte');
+
+            const indEntretien = entretienJour * joursGarde;
+            const indRepas = repasJour * joursGarde;
+            const totalSalaire = salaireMensuel + indEntretien + indRepas;
+            const cmg = Math.round(totalSalaire * cmgRate * 100) / 100;
+            const net = totalSalaire - cmg - acompte;
+            const resteAPayer = Math.max(0, net);
+            const refund = net < 0 ? Math.abs(net) : 0;
+
+            document.getElementById('day-count').textContent = joursGarde;
+            document.getElementById('r-salaire').textContent = fmt(salaireMensuel);
+            document.getElementById('r-entretien').textContent = fmt(indEntretien);
+            document.getElementById('r-repas').textContent = fmt(indRepas);
+            document.getElementById('r-total-salaire').textContent = fmt(totalSalaire);
+            document.getElementById('r-cmg').textContent = '- ' + fmt(cmg);
+            document.getElementById('r-acompte').textContent = '- ' + fmt(acompte);
+            document.getElementById('result-total').textContent = fmt(resteAPayer);
+
+            const refundEl = document.getElementById('result-refund');
+            if (refund > 0) {
+                refundEl.style.display = 'block';
+                refundEl.textContent = 'Pajemploi vous remboursera ' + fmt(refund);
+                document.getElementById('result-label').textContent =
+                    '\u00e0 payer ce mois (apr\u00e8s CMG)';
+            } else {
+                refundEl.style.display = 'none';
+                document.getElementById('result-label').textContent =
+                    '\u00e0 payer ce mois (apr\u00e8s CMG)';
+            }
+
+            document.getElementById('display-salary').textContent = fmt(salaireMensuel);
+            document.getElementById('display-entretien').textContent = fmt(entretienJour);
+            document.getElementById('display-cmg').textContent =
+                (cmgRate * 100).toFixed(2) + ' %';
+        }
+
+        function toggleEdit() {
+            const el = document.getElementById('contract-edit');
+            const btn = document.getElementById('toggle-edit');
+            el.classList.toggle('open');
+            btn.textContent = el.classList.contains('open')
+                ? 'Masquer les param\u00e8tres'
+                : 'Modifier les param\u00e8tres';
+        }
+
+        buildCalendar();
+    </script>
+</body>
+</html>
